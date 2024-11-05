@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StudentData {
+
+    // Define a structure for storing student information
+    struct Student {
+        uint256 id;
+        string name;
+        uint256 age;
+    }
+
+    // Array to store all student data
+    Student[] public students;
+
+    // Mapping to check if a student with an ID exists
+    mapping(uint256 => bool) public studentExists;
+
+    // Event to be emitted when a student is added
+    event StudentAdded(uint256 id, string name);
+
+    // Function to add a new student
+    function addStudent(uint256 _id, string memory _name, uint256 _age) public {
+        require(!studentExists[_id], "Student ID already exists");
+
+        // Create a new Student instance and add it to the students array
+        students.push(Student({
+            id: _id,
+            name: _name,
+            age: _age
+        }));
+
+        // Mark this student ID as existing
+        studentExists[_id] = true;
+
+        // Emit an event for adding a new student
+        emit StudentAdded(_id, _name);
+    }
+
+    // Function to get a student's details by index in the students array
+    function getStudent(uint256 index) public view returns (uint256, string memory, uint256) {
+        require(index < students.length, "Student index out of range");
+
+        Student memory student = students[index];
+        return (student.id, student.name, student.age);
+    }
+
+    // Fallback function to handle accidental Ether transfers
+    fallback() external {
+        // Optionally revert or log the transaction
+        revert("This contract does not accept Ether");
+    }
+}
